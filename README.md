@@ -34,3 +34,11 @@ There are 3 types of works that was done during this report:
 3. Analysis:
 
     This part is actually very time consuming and with better understanding of the data, I have to come back to step 1 and 2 for better process.
+
+# What can be done further:
+
+1. Inspect each train route
+2. Plotting moving average on time series
+3. Do statistical test on the time series
+4. More well designed visualization
+...
