@@ -5,6 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from plotly.subplots import make_subplots
+import plotly.express as px
 
 DATA_DIR = 'data/data.parquet'
 df = pd.read_parquet(DATA_DIR, engine='auto')
@@ -58,6 +59,19 @@ def make_total_ts(df, f=None):
     fig.update_yaxes(title_text="<b>Price</b>", secondary_y=True)
     return fig
 
+def make_year_table(df, year=2019):
+    df_year = df[df['od_origin_year']==year]
+    table = pd.DataFrame()
+    df2 = df_year.groupby(by=['departure_date']).sum()
+    table['demand']=df2['demand']
+    table['total_sale']=df2['total_sale']
+    df3 = df_year.groupby(by=['departure_date']).mean()
+    table['od_origin_week'] = df3['od_origin_week']
+    table['od_origin_weekday'] = df3['od_origin_weekday']
+    table['school_holiday'] = df3['origin_current_school_holiday']
+    table['public_holiday'] = df3['origin_current_public_holiday']
+    return table
+
 app = dash.Dash()
 app.layout = html.Div([
     html.Div([
@@ -71,6 +85,14 @@ app.layout = html.Div([
     html.H2("Time series on given Departure and Destination"),
     dcc.Graph(
         id='TS',
+    ),
+    html.H2("Daily sale on year calender 2019"),
+    dcc.Graph(
+        id='SaleCalender',
+    ),
+    html.H2("Daily sale on year calender 2020"),
+    dcc.Graph(
+        id='SaleCalenderNow',
     )
 ])
 
@@ -83,6 +105,32 @@ def make_fig(Departure, Destination):
     key2 = [str(Destination)]
     data = get_df_ab(df, key1, key2)
     fig = make_total_ts(data)
+    return fig
+@app.callback(
+    Output('SaleCalender', 'figure'),
+    Input('Departure', 'value'),
+    Input('Destination', 'value'))
+def make_fig2(Departure, Destination):
+    key1 = [str(Departure)]
+    key2 = [str(Destination)]
+    data = get_df_ab(df, key1, key2)
+    data_2019 = make_year_table(data, year=2019)
+    fig = px.scatter(data_2019, x="od_origin_week", y="od_origin_weekday", color="demand",
+                size='total_sale', hover_data=["school_holiday","public_holiday"])
+    fig.update_yaxes(autorange="reversed")
+    return fig
+@app.callback(
+    Output('SaleCalenderNow', 'figure'),
+    Input('Departure', 'value'),
+    Input('Destination', 'value'))
+def make_fig3(Departure, Destination):
+    key1 = [str(Departure)]
+    key2 = [str(Destination)]
+    data = get_df_ab(df, key1, key2)
+    data_2020 = make_year_table(data, year=2020)
+    fig = px.scatter(data_2020, x="od_origin_week", y="od_origin_weekday", color="demand",
+                size='total_sale', hover_data=["school_holiday","public_holiday"])
+    fig.update_yaxes(autorange="reversed")
     return fig
 
 app.run_server(debug=True, use_reloader=False)

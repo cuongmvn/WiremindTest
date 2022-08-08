@@ -7,6 +7,7 @@ python dashboard_app.py
 '''
 Then access the default local address (http://127.0.0.1:8050/).
 ![alt text](https://github.com/cuongmvn/WiremindTest/blob/main/demo.jpg?raw=true)
+![alt text](https://github.com/cuongmvn/WiremindTest/blob/main/demo1.jpg?raw=true)
 # The Approach or Overview of Analysis Report:
 
 1. I take broad views inspection of the whole dataset, (analysing the data of all train in full-year time scale).
